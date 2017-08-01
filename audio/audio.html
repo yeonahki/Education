@@ -1,0 +1,114 @@
+<html>
+  <head>
+    <title> Yeonah's Audio </title> <!-- 웹 페이지 탭에 보이는 오디오 제목 설정 -->
+		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <script src="/socket.io/socket.io.js"></script> <!-- 오디오와 통신을 위한 라이브러리 추가 -->
+		<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script> <!-- 문법관련 라이브러리 추가 -->
+    <script>
+    /* 오디오와 실제로 통신하는 부분 */
+ 	$(function(){
+		var socket = io(); // 오디오 서버와 연결
+		$('#status').text('Waiting...');  // 리모컨 상단에 보이는 글씨
+
+		socket.on('usb_list', function(list){ /* usb 목록을 웹 페이지에 출력 */
+		  $('#usb ul').empty();
+
+		  list.forEach(function(item){
+		    var token = item.split('/');
+		    var title = token[token.length-1];
+
+		    $('<li>').append($('<i>').text(' '+title)).data('item', {title:title, file:item}).prependTo('#usb ul');
+		  });
+		});	
+		/* usb 리스트에서 음악을 클릭했을 때 처리하는 부분 */		
+		$('#usb').on('click', 'li', function(){
+		  var item = $(this).data('item');
+		  console.log(item.title.split('.mp3')[0]);
+		  $('#music').text(' Title: ' + item.title.split('.mp3')[0]);
+		  $('#status').text('Now playing...');
+		  socket.emit('play', item);
+		});
+
+		/* usb 리스트에서 자동재생을 클릭했을 때 처리하는 부분 */
+		$('#auto').click(function(){
+		  $('#music').text('USB All Music');
+		  $('#status').text('Now playing...');
+		  socket.emit('auto');
+		});
+
+		/* stop 버튼을 클릭했을 때 처리하는 부분 */
+		$('#stop').click(function(){
+		  socket.emit('stop');
+		  $('#status').text('Waiting...');
+		  $('#music').text('');
+		});
+
+		/* 음량 키우기를 클릭했을 때 처리하는 부분 */
+		$('#vol_up').click(function(){
+		  socket.emit('vol_up');
+		});
+
+		/* 음량 줄이기를 클릭했을 때 처리하는 부분 */
+		$('#vol_down').click(function(){
+		  socket.emit('vol_down');
+		});
+		
+		/* mbc를 클릭했을 때 처리하는 부분 */
+		$('#mbc').click(function(){
+		  $('#status').text('Now playing...');
+		  $('#music').text('MBC Radio');
+		  socket.emit('mbc_radio');
+		});
+		
+		/* kbs를 클릭했을 때 처리하는 부분 */
+		$('#kbs').click(function(){
+		  $('#status').text('Now playing...');
+		  $('#music').text('KBS Radio');
+		  socket.emit('kbs_radio');
+		});
+
+		/* sbs를 클릭했을 때 처리하는 부분 */	
+		$('#sbs').click(function(){
+		  $('#status').text('Now playing...');
+		  $('#music').text('SBS Radio');
+		  socket.emit('sbs_radio');
+		});
+	});
+    </script>
+  </head>
+  <body>
+    <!-- 
+  	리모컨 보이는 부분 만들기
+  	버튼, 글씨 출력 위치 정하기
+  	위의 <script> 부분과 연결하여 동작
+  	-->
+		<button id='shutdown'><span class='fa fa-power-off'></span></button>
+		<button id='reboot'><span class='fa fa-refresh'></span></button>
+    <h2>Yeonah's Audio <span class='fa fa-music'></span></h2>
+    <h3><span id='status'></span></h3>
+    
+		<span id='music'></span><br><br>
+		<button id='auto'><span class='fa fa-random'></span></button>
+		<button id='stop'><span class='fa fa-stop'></span></button>
+		<button id='vol_up'><span class='fa fa-volume-up'></span></button>
+		<button id='vol_down'><span class='fa fa-volume-down'></span></button><br><br>
+    <table>
+			<tr>
+				<td>
+      		<h4>USB Music List</h4>
+	  			<section id='usb'>
+						<ul></ul>
+	  			</section>
+    		</td>
+			</tr>
+    	<tr>
+				<td>
+      		<h4>FM Internet Radio</h4>
+ 					<button id='mbc'>MBC</button>
+ 					<button id='kbs'>KBS</button>
+ 					<button id='sbs'>SBS</button>
+    		</td>
+			</tr>
+		</table>
+  </body>
+</html>
