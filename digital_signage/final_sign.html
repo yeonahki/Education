@@ -1,0 +1,60 @@
+<html>
+<head>
+	<title> Digital Signage </title>
+	<script src='/socket.io/socket.io.js'></script>
+	<script src='http://code.jquery.com/jquery-3.1.1.min.js'></script>
+	<script>
+		$(function(){
+			var socket = io();
+
+			socket.on('image', function(data){
+				$('#image').attr('src', 'data:image/jpeg;charset=utf-8;base64, '+data);
+				console.log(image);
+			});
+
+			socket.on('temp', function(data){
+				$('#temperature').text(data.temp);
+				$('#humidity').text(data.humi);
+			});
+
+			socket.on('weather', function(data){
+				console.log(Date() + 'updated weather Info');
+				$('#temp_out').text(data.temp);
+				$('#wfen').text(data.wfen);
+			});
+			setInterval(function(){
+				var date = new Date();
+				var now = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate()+' '+date.getHours()+':'+date.getMinutes()+':'+date.getSeconds();
+				$('#date').text(now);
+			}, 1000);
+		});
+	</script>
+</head>
+<body>
+	<table width=100%>
+		<tr>
+			<td rowspan=2 align='center'><img id='image' width=500 height=720></td>
+			<td>
+				<h1>Information</h1>
+				<h3><span id='date'></span></h3>
+				<h2>Inside My Home</h2>
+				<h3>
+					<span id='temperature'>0</span><span>°C,   </span><span id='humidity'>0</span><span>%</span>
+				</h3>
+				<h2>Outside My Home</h2>
+				<h3>
+					Weather<br>
+					<span id='temp_out'>0</span><span>°C,     </span><span id='wfen'></span>
+				</h3>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p align='middle'>
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/_hsrsmwHv0A?rel=0&autoplay=1&loop=1&listType=search&list=Hyoshin" frameborder="0"></iframe>
+				</p>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>
